@@ -1,0 +1,268 @@
+---
+title: "Uvod u analizu podataka"
+author: "Upišite svoje ime i prezime"
+output:
+  html_document: default
+---
+
+Statistika je znanost o učenju iz podataka. Ona uključuje prikupljanje, prikazivanje, analizu i korištenje podataka za donošenje odluka i rješavanje problema. Ovaj materijal će Vam pomoći u svladavanju analize podataka u R-u te primjeni analiza u svojim seminarskim radovima.
+
+Analiza podataka će se raditi na skupu podataka *filmovi.txt*.
+
+Prvi korak je učitati dani skup podataka koji ćemo nazvati *Filmovi*.
+
+```{r warning=FALSE}
+#Filmovi = read.delim(file.choose(),header=T,sep="\t")
+
+library(readxl)
+Filmovi <- read_excel("Filmovi.xlsx")
+```
+
+Prvih nekoliko redaka danog skupa je:
+
+```{r warning=FALSE}
+head(Filmovi)
+dim(Filmovi)
+```
+
+Dan je ispis prvih šest redaka matrice podataka (6 opservacija) sa svojim svojstvima. Ta svojstva su varijable i ima ih 8. Dakle, u matrici podataka (danom skupu podataka) imamo ukupno 120 opservacija i 8 varijabli, što se može provjeriti tako da ispitamo dimenziju skupa *Filmovi*.
+
+Varijable su sljedeće (uz njezinu klasifikaciju):
+
+-   Movie - naziv filma (nominalna)
+
+-   Run.Time..minutes. - trajanje filma u minutama (numerička)
+
+-   Budget.... - budžet u US dolarima (numerička)
+
+-   Dramas - pripada li film drami ili ne (nominalna)
+
+-   Stars - broj zvjezdica (numerička)
+
+-   Rating - MPA ocjena filma (klasifikacija filma prema primjerenosti) (nominalna)
+
+-   Genre - žanr (nominalna)
+
+-   USGross.... - bruto zarada filma u US dolarima (numerička)
+
+```{r warning=FALSE}
+names(Filmovi)                             # popis varijabli
+
+sapply(Filmovi, class)                     # popis varijabli s njihovom klasifikacijom
+
+# Radi lakše daljnje analize, neke varijable ćemo preimenovati
+names(Filmovi)[names(Filmovi) == "Run Time (minutes)"] <- "Time"
+names(Filmovi)[names(Filmovi) == "Budget ($)"] <- "Budget"
+names(Filmovi)[names(Filmovi) == "USGross ($)"] <- "USGross"
+```
+
+Nakon što smo utvrdili od kojih se varijabli sastoji skup podataka, napravit ćemo deskriptivnu statistiku za dane varijable. Postoji više funkcija koje će nam pomoći u tome, ovisno o potrebama analize.
+
+```{r warning=FALSE}
+summary(Filmovi)
+
+library(psych) 
+describe(Filmovi, 
+         check = FALSE,                    # check = FALSE -> ne računa deskriptivu za kvalitativne varijable 
+         quant = c(.25,.75),               # donji i gornji kvartil 
+         IQR = TRUE,                       # interkvartilni raspon 
+         omit = TRUE)                      # izostavlja nenumeričke varijable
+
+library(summarytools) 
+descr(Filmovi) 
+```
+
+Funkcija *summary* daje ispis minimalne i maksimalne vrijednosti numeričkih varijabli, zatim donjeg i gornjeg kvartila, medijana i aritmetičke sredine.
+
+Iz paketa *psych* funkcija *describe* daje i neke dodatne izračune deskriptivne statistike, poput standardne devijacije, koeficijenata iskrivljenosti i zaobljenosti i druge.
+
+Ima mnogo paketa u R-u pomoću kojih možemo izračunati deskriptivnu statistiku za opisivanje skupa podataka.
+
+Grafički prikazi varijabli su jako bitni. Grafički prikazi numeričkih varijabli dat će nam uvid u samu distribuciju podataka. Numeričke varijable najčešće prikazujemo histogramom i boxplot dijagramom, a ako nas zanima odnos između numeričkih varijabli, tj. njihova povezanost, tada ćemo taj odnos prikazati dijagramom raspršenja.
+
+```{r warning=FALSE}
+library(graphics)
+par(mfrow=c(2,2))
+hist(Filmovi$Time, main = "Histogram varijable Run.Time..minutes.", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue")
+hist(Filmovi$Budget, main = "Histogram varijable Budget....", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue")
+hist(Filmovi$Stars, main = "Histogram varijable Stars", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue")
+hist(Filmovi$USGross, main = "Histogram varijable USGross....", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue")
+par(mfrow=c(1,1))
+```
+
+Iz histograma možemo vidjeti da varijable imaju pozitivno asimetričnu distribuciju podataka (iskrivljenu udesno) sa stršilima (osim varijable "Stars"), što možemo provjeriti boxplot dijagramima. Varijabla "Stars" ima uniformnu distribuciju.
+
+```{r warning=FALSE}
+par(mfrow=c(2,2))
+boxplot(Filmovi$Time, main = "Boxplot varijable Run.Time..minutes.", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue", horizontal = TRUE)
+boxplot(Filmovi$Budget, main = "Boxplot varijable Budget....", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue", horizontal = TRUE)
+boxplot(Filmovi$Stars, main = "Boxplot varijable Stars", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue", horizontal = TRUE)
+boxplot(Filmovi$USGross, main = "Boxplot varijable USGross....", xlab = "Varijabla", ylab = "Frekvencija", col = "lightblue", horizontal = TRUE)
+par(mfrow=c(1,1))
+```
+
+Odnos između varijabli provjeravamo dijagramom raspršenja. Možemo pojedinačno uspoređivati po dvije numeričke varijable ili ih sve prikazati u matrici dijagrama raspršenja.
+
+```{r warning=FALSE}
+plot(x=Filmovi$Time, y=Filmovi$Budget, xlab = "Time", ylab = "Budget")
+
+pairs(~Time+Budget+Stars+USGross,data = Filmovi,
+   main = "Matrica dijagrama raspršenja")
+
+#install.packages("PerformanceAnalytics")           
+library("PerformanceAnalytics")
+chart.Correlation(Filmovi[,c("Time","Budget","Stars","USGross")], histogram=TRUE, pch=16)     
+                           # uz dijagrame raspršenja tu je prikaz koeficijenata korelacija između varijabli
+
+library(corrplot)
+res = cor(Filmovi[,c("Time","Budget","Stars","USGross")])     # koeficijenti korelacije
+corrplot(res, type = "upper", order = "hclust",               # grafički prikaz korelacija između varijabli
+         tl.col = "black", tl.srt = 45, sig.level = 0.01)
+```
+
+Prema danoj matrici dijagrama raspršenja, možemo vidjeti da neke varijable imaju srednje (slabu) pozitivnu linearnu povezanost, sa stršilima, a neke nisu povezane.
+
+Kako čitamo grafički prikaz iz funkcije *chart.Correlation*:
+
+-   distribucija svake varijable (histogram) prikazana je na dijagonali;
+
+-   u donjem dijelu ispod dijagonale nalaze se dijagrami raspršenja;
+
+-   u gornjem dijelu iznad dijagonale prikazane su vrijednosti koeficijenata korelacije između varijabli s nivoima signifikantnosti označenim zvjezdicama;
+
+    -   svaki nivo signifikantnosti je povezan simbolom: p-vrijednosti(0, 0.001, 0.01, 0.05, 0.1, 1) \<=\> simboli(“***”, “**”, “*”, “.”, " “)
+
+Neke od varijabli su kvalitativne te ćemo ih opisati sljedećim funkcijama.
+
+```{r warning=FALSE}
+addmargins(table(Filmovi$Rating))                     # tablica apsolutnih frekvencija s ukupnim brojem
+prop.table(table(Filmovi$Rating))                     # tablica proporcija (relativnih frekvencija)
+prop.table(table(Filmovi$Rating)) * 100               # tablica postotaka
+
+addmargins(table(Filmovi$Genre))
+prop.table(table(Filmovi$Genre))
+prop.table(table(Filmovi$Genre)) * 100
+
+freq(Filmovi$Rating)
+freq(Filmovi$Genre)
+```
+
+Modaliteti varijable *Rating* su G (6, 5%), PG (20, 16.67%), PG-13 (56, 46.67%) i R (38, 31.67%). Najviše je filmova koji nisu primjereni za djecu mlađu od 13 godina (PG-13), zatim filmova koji za mlađe od 17 godina zahtjevaju pratnju roditelja ili skrbnika (R), pa filmova koji nisu prikladni za djecu (PG), a najmanje je filmova koji su primjereni za sve uzraste (G).
+
+Što se tiče žanra, najviše je komedija (38, 31.67%), zatim drama (28, 23.33%), akcijskih filmova (20, 16.67%), pustolovnih (15, 12.5%), horora (13, 10.83%) i najmanje trilera (6, 5%).
+
+Zanima li nas koliko je filmova prema ove obje kvalitativne varijable, trebamo napraviti kontingencijsku tablicu.
+
+```{r warning=FALSE}
+table(Filmovi$Rating, Filmovi$Genre)                    # kontingencijska tablica
+
+ctable(x=Filmovi$Rating,                                # želimo li postotke po stupcu ili ukupnom broju - prop = "c" ili "t"
+       y=Filmovi$Genre)
+```
+
+U analizi je važna i vizualizacija varijabli danog skupa podataka.
+
+Kvalitativne varijable možemo prikazati stupčastim dijagramima (bar chart), dijagram pita (pie chart), višestrukim stupcima, strukturnim stupcima, mozaik dijagramima itd.
+
+Neki primjeri vizualizacije kvalitativnih varijabli su:
+
+```{r warning=FALSE}
+barplot(table(Filmovi$Rating),                                 # apsolutne frekvencije
+        col = "lightblue",
+        main = "Stupčasti dijagram",
+        xlab = "Rating",
+        ylab = "frekvencija")
+
+barplot(prop.table(table(Filmovi$Genre))*100,                  # proporcije / postotak
+        col = "lightblue",
+        main = "Stupčasti dijagram",
+        xlab = "Žanr",
+        ylab = "%")
+
+barplot(table(Filmovi$Rating,Filmovi$Genre), beside=T, legend=T, main = "Višestruki stupci", col = rainbow(4))
+barplot(table(Filmovi$Genre,Filmovi$Rating), beside=T, legend=T, main = "Višestruki stupci", col = rainbow(6), args.legend = list(x = "topleft"))
+
+mosaicplot(table(Filmovi$Genre,Filmovi$Rating), color = rainbow(4), las = 1)
+```
+
+Želimo li prikazati numeričku varijablu prema modalitetima kvalitativne varijable, to možemo učiniti tako da nacrtamo side by side boxplot dijagram pomoću kojeg možemo uspoređivati distribucije numeričke varijable po grupama kvalitativne varijable.
+
+```{r warning=FALSE}
+describe.by(Filmovi$Budget, group=Filmovi$Genre,mat=TRUE)                    # deskriptivna statistika 
+
+boxplot(Filmovi$Budget ~ Filmovi$Genre,
+        col = rainbow(6), xlab="Žanr",ylab="Budget")
+
+boxplot(Filmovi$Budget ~ Filmovi$Rating,
+        col = rainbow(6), xlab="Rating",ylab="Budget")
+```
+
+Neke varijable R automatski klasificira kao numeričke, iako su one kvalitativne. Zato ih mi moramo pretvoriti u kvalitativne kako bi mogli raditi ispravnu analizu. Na primjer, varijabla "Dramas" je klasificirana kao numerička varijabla, iako mi znamo da je kvalitativna s obzirom da u modaliteti te varijable 0 i 1 (je li neki film drama ili ne).
+
+```{r warning=FALSE}
+summary(Filmovi$Dramas)                               # numerička varijabla
+class(Filmovi$Dramas)
+Filmovi$Dramas <- as.factor(Filmovi$Dramas)           # pretvorba u kvalitativnu varijablu
+class(Filmovi$Dramas)
+summary(Filmovi$Dramas)
+```
+
+Želimo li ispitati ovisi li žanr filmova o zvjezdicama koji ima film, to ćemo napraviti korištenjem hi-kvadrat testa. Međutim, varijabla *Stars* je numerička, a trebala bi biti kvalitativna, stoga ćemo ju najprije pretvoriti u kvalitativnu s modalitetima "2", "3", "4" i "5".
+
+```{r warning=FALSE}
+Filmovi$Stars_1 <- cut(Filmovi$Stars,breaks=c(0,2,3,4,5),labels=c("2", "3", "4", "5"), as.factor.result=TRUE)
+summary(Filmovi$Stars_1)
+```
+
+Napravit ćemo kontigencijsku tablicu ovih varijabli i prikazati grafički stupčastim dijagramom.
+
+```{r warning=FALSE}
+kont.tab = table(Filmovi$Stars_1, Filmovi$Genre) 
+kont.tab
+barplot(kont.tab, beside=T, legend=T, col = rainbow(4))
+```
+
+Provest ćemo hi-kvadrat test kako bi ispitali postoji li zavisnost između varijabli.
+
+Trebamo najprije postaviti hipoteze:
+
+-   $H_0$ : Broj dobivenih zvjezdica ne ovisi o žanru filma.
+
+-   $H_1$ : Broj dobivenih zvjezdica ovisi o žanru filma.
+
+```{r warning=FALSE}
+test = chisq.test(kont.tab, correct=TRUE)
+test
+```
+
+Testna veličina iznosi 40.951, broj stupnjeva slobode je 15 (=(4-1)\*(6-1)). p-vijednost iznosi 0.0003254 što je manje od razine statističke značajnosti od 5% (1%) iz čega možemo zaključiti da ćemo odbaciti nultu hipotezu, tj. možemo zaključiti da broj dobivenih zvjezdica ovisi o žanru filma.
+
+Grafički prikaz:
+
+```{r warning=FALSE}
+curve(dchisq(x, df=15), from = 0, to = 50,
+      ylim = c(0,0.005),
+      main = 'Chi-Square Distribution (df = 15)', 
+      ylab = 'Density', 
+      lwd = 2, 
+      col = 'steelblue') 
+
+x1 = qchisq(0.05, df = 15, lower.tail = FALSE)             # teorijska vrijednost
+x1
+x2 = test$statistic
+x2
+
+#kreiramo vektor od x vrijednosti
+x_vector1 <- seq(x1, 50)
+x_vector2 <- seq(x2, 50)
+
+#create vector of chi-square density values
+p_vector1 <- dchisq(x_vector1, df = 15)
+p_vector2 <- dchisq(x_vector2, df = 15)
+
+#fill in portion of the density plot from x to 50
+polygon(c(x_vector1, rev(x_vector1)), c(p_vector1, rep(0, length(p_vector1))),
+        col = adjustcolor('blue', alpha=0.3), border = NA)
+polygon(c(x_vector2, rev(x_vector2)), c(p_vector2, rep(0, length(p_vector2))),
+        col = adjustcolor('red', alpha=1.5), border = NA)
+```

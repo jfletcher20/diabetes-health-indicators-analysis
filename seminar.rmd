@@ -1,0 +1,40 @@
+---
+title: "Zdravstveni pokazatelji dijabetesa 1 (CDC Diabetes Health Indicators)"
+dataset: "https://archive.ics.uci.edu/dataset/891/cdc+diabetes+health+indicators"
+author: "Joshua Lee Fletcher, Noa Midžić"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+install.packages(c("dplyr", "tidyr"))
+```
+
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidyr)
+```
+
+```{r}
+# Read the data
+data <- read_csv("diabetes_012_health_indicators_BRFSS2015.csv")
+head(data)
+```
+
+```{r}
+# Melt the data frame into a long format
+data_long <- data %>% gather(key = "parameter", value = "value")
+head(data_long)
+```
+
+```{r}
+# Plot the data
+ggplot(data_long, aes(x = value)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(~ parameter, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Value", y = "Count", title = "Distribution of Different Parameters")
+```

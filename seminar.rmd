@@ -6,6 +6,64 @@ output:
   pdf_document: default
 ---
 
+# Opis podataka
+
+Podaci su preuzeti sa [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/891/cdc+diabetes+health+indicators) i predstavljaju zdravstvene pokazatelje dijabetesa. Podaci su prikupljeni 2015. godine putem telefonskih anketa. Uzorak je slučajno odabran iz populacije odraslih osoba u Sjedinjenim Američkim Državama.
+
+## Deskriptivna statistika
+
+` Kratak opis svih varijabli u skupu podataka `
+
+```{r}
+# histogram za neki zadani podatak (u ovom slučaju Age)
+ggplot(data, aes(x = Age, fill = ..x..)) +
+  geom_histogram(binwidth = 1, aes(fill = ..x..)) +
+  scale_fill_gradient(low = "blue", high = "red") +
+  labs(x = "Broj godina", y = "Broj odgovora", title = "Distribucija godina ispitanika") # nolint
+```
+
+Graf prikazuje distribuciju godina ispitanika. Najveći broj ispitanika ima između X i Y.
+
+Distribucija BMI-a ispitanika:
+
+```{r}
+ggplot(data, aes(x = BMI, fill = ..x..)) +
+  geom_histogram(binwidth = 1, aes(fill = ..x..)) +
+  scale_fill_gradient(low = "blue", high = "red") +
+  labs(x = "BMI", y = "Broj odgovora", title = "Distribucija BMI-a ispitanika") # nolint
+```
+
+Graf prikazuje distribuciju BMI-a ispitanika. Najveći broj ispitanika ima BMI između X i Y.
+
+Korelacija između godina i BMI-a:
+
+```{r}
+ggplot(data, aes(x = Age, y = BMI)) +
+  geom_point() +
+  labs(x = "Godine", y = "BMI", title = "Korelacija između godina i BMI-a") # nolint
+```
+
+boxplot za BMI osobe koji imaju Diabetes_binary = 1
+
+```{r}
+has_diabetes <- data %>% filter(Diabetes_binary == 1)
+ggplot(has_diabetes, aes(x = Diabetes_binary, y = BMI)) +
+  geom_boxplot() +
+  labs(x = "Dijabetes", y = "BMI", title = "Boxplot za BMI osobe koje imaju dijabetes") # nolint
+```
+
+boxplot za BMI osobe koje imaju Diabetes_binary = 0
+
+```{r}
+does_not_have_diabetes <- data %>% filter(Diabetes_binary == 0) # nolint
+ggplot(does_not_have_diabetes, aes(x = Diabetes_binary, y = BMI)) +
+  geom_boxplot() +
+  labs(x = "Dijabetes", y = "BMI", title = "Boxplot za BMI osobe koje nemaju dijabetes") # nolint
+```
+
+
+
+
 ```{r setup, include=FALSE}
 if (!tinytex:::is_tinytex()) tinytex::install_tinytex()
 options(repos = c(CRAN = "https://cloud.r-project.org/"))
@@ -17,19 +75,18 @@ library(readr)
 library(tidyr)
 ```
 
-```{r}
+```{r, include=FALSE}
 # Read the data
 data <- read_csv("diabetes_binary_5050split_health_indicators_BRFSS2015.csv")
-head(data)
 ```
 
-```{r}
+```{r, include=FALSE}
 # Melt the data frame into a long format
 data_long <- data %>% gather(key = "parameter", value = "value")
-head(data_long)
 ```
 
 ```{r}
+head(data_long)
 # Plot the data
 ggplot(data_long, aes(x = value)) +
   geom_histogram(binwidth = 1) +

@@ -7,11 +7,10 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-install.packages(c("dplyr", "tidyr"))
-```
+if (!tinytex:::is_tinytex()) tinytex::install_tinytex()
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+install.packages(c("dplyr", "tidyr", "readr", "ggplot2"))
 
-```{r setup, include=FALSE}
-# Load necessary libraries
 library(ggplot2)
 library(dplyr)
 library(readr)
@@ -20,7 +19,7 @@ library(tidyr)
 
 ```{r}
 # Read the data
-data <- read_csv("diabetes_012_health_indicators_BRFSS2015.csv")
+data <- read_csv("diabetes_binary_5050split_health_indicators_BRFSS2015.csv")
 head(data)
 ```
 

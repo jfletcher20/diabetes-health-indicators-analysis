@@ -1,4 +1,4 @@
-# CDC Diabetes health indicators (Zdravstveni pokazatelji dijabetesa 1)
+# CDC Diabetes health indicators (Zdravstveni pokazatelji dijabetesa)
 
 This seminar analyzes data gathered by the Center for Disease Control and Prevention, conducting tests to ascertain whether or not any of the data correlates.
 

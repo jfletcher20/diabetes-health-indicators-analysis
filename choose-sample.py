@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd # type: ignore
 
 data = pd.read_csv("diabetes_binary_5050split_health_indicators_BRFSS2015.csv")
 
@@ -12,8 +12,8 @@ selected_1 = diabetes_1.sample(num_per_class)
 
 selected_data = pd.concat([selected_0, selected_1])
 
-selected_data = selected_data.sample(frac=1).reset_index(drop=True)
+selected_data = selected_data.sample(frac = 1).reset_index(drop = True)
 
-selected_data.to_csv("selected_data.csv", index=False)
+selected_data.to_csv("selected_data.csv", index = False)
 
 print("Selected data saved to selected_data.csv")

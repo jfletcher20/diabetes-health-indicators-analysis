@@ -5,26 +5,26 @@ data <- read.csv(file.choose())
 
 data$Diabetes_binary <- as.factor(data$Diabetes_binary)
 
-data$BMI_Group <- cut(data$BMI, breaks = c(0, 18.5, 24.9, 29.9, 39.9, Inf),
+data$BMI_Group <- cut(data$BMI, breaks = c(0, 18.5, 24.9, 29.9, 39.9, Inf), 
                       labels = c("Underweight", "Healthy weight", "Overweight", "Obesity", "Severe obesity"))
-data$Age_Group <- cut(data$Age, breaks = c(seq(0, 13, by = 3)), labels = c("18-34", "35-54", "55-69", "70-80+"))
-data$Education_Group <- cut(data$Education, breaks = c(seq(0, 6, by = 2)), labels = FALSE)
+data$Age_Group <- cut(data$Age, breaks = c(seq(0, 13, by=3)), labels = c("18-34", "35-54", "55-69", "70-80+"))
+data$Education_Group <- cut(data$Education, breaks = c(seq(0, 6, by=2)), labels = FALSE)
 
 vars <- c("HighChol", "CholCheck", "BMI_Group", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost",
           "Sex", "Age_Group", "Education_Group", "Income")
 
 for (var in vars) {
-  tab <- table(data$Diabetes_binary, data[[var]])
+  Tab <- table(data$Diabetes_binary, data[[var]])
   cat("Table for", var, ":\n")
-  print(tab)
-  barplot(tab, beside = TRUE, legend = TRUE, main = paste("Barplot for", var))
+  print(Tab)
+  barplot(Tab, beside = TRUE, legend = TRUE, main = paste("Barplot for", var))
   
-  c_test <- chisq.test(tab, correct = TRUE)
+  CTest <- chisq.test(Tab, correct = TRUE)
   cat("\nH0: The", var, "is independent of Diabetes_binary\n")
   cat("H1: The", var, "is not independent of Diabetes_binary\n\n")
-  print(c_test)
+  print(CTest)
   
-  p_value <- c_test$p.value
+  p_value <- CTest$p.value
   
   if (p_value <= 0.01) {
     cat("\nReject H0: There is a significant association between", var, "and Diabetes_binary\n\n")
@@ -35,7 +35,7 @@ for (var in vars) {
 
 vars_to_test <- c("BMI", "Age")
 
-for (var in vars_to_test) { # nolint
+for (var in vars_to_test) {
   sw_test_diabetic <- shapiro.test(data[[var]][data$Diabetes_binary == 1])
   sw_test_nondiabetic <- shapiro.test(data[[var]][data$Diabetes_binary == 0])
   
@@ -60,7 +60,8 @@ for (var in vars_to_test) { # nolint
   cat("\nBartlett's test for", var, ":\n")
   print(bartlett_test)
 
-  if (sw_test_diabetic$p.value > 0.01 && sw_test_nondiabetic$p.value > 0.01) {
+
+  if (sw_test_diabetic$p.value > 0.01 & sw_test_nondiabetic$p.value > 0.01) {
     cat("Both groups follow a normal distribution.\n")
     
     if (f_test$p.value > 0.01 && levene_test$p.value && bartlett_test$p.value) {
@@ -73,7 +74,7 @@ for (var in vars_to_test) { # nolint
       if (t_test$p.value <= 0.01) {
         cat("\nReject H0: There is a significant difference in ", var, " between diabetic and non-diabetic groups.\n")
       } else {
-        cat("\nFail to reject H0: There is no significant difference in ", var, " between diabetic and non-diabetic groups.\n")
+        cat("\nFail to reject H0: There is no significant difference in ", var," between diabetic and non-diabetic groups.\n")
       }
       
     } else {
@@ -124,12 +125,72 @@ vars_to_plot <- c("BMI", "Age")
 par(mfrow = c(1, length(vars_to_plot)))
 
 for (var in vars_to_plot) {
-  boxplot(data[[var]] ~ data$Diabetes_binary,
-          xlab = "Diabetes Status",
-          ylab = var,
+  boxplot(data[[var]] ~ data$Diabetes_binary, 
+          xlab = "Diabetes Status", 
+          ylab = var, 
           main = paste("Boxplot of", var, "by Diabetes Status"),
           col = c("lightblue", "lightgreen"),
           names = c("Non-Diabetic", "Diabetic"))
 }
 
 par(mfrow = c(1, 1))
+
+
+# Deskriptivna statistika - numericka varijabla (BMI)
+median_bmi <- median(data$BMI)
+print(median_bmi)
+
+mean_bmi <- mean(data$BMI)
+print(mean_bmi)
+
+standard_deviation <- sd(data$BMI)
+print(standard_deviation)
+
+variance <- var(data$BMI)
+print(variance)
+
+quantiles <- quantile(data$BMI, probs = c(0.25, 0.5, 0.75))
+print(quantiles)
+
+correlation <- cor(data$PhysHlth, data$BMI)
+print(correlation)
+
+plot(data$PhysHlth, data$BMI,
+     xlab = "PhysHlth",
+     ylab = "BMI",
+     main = "Korelacija između PhysHlth i BMI")
+
+fit <- lm(data$BMI ~ data$PhysHlth)
+
+abline(fit, col = "red")
+
+# Deskriptivna statistika - kvalitativne varijable
+promatranja <- table(data$Diabetes_binary)
+pie(promatranja, labels = c("Nema dijabetes", "Ima dijabetes"), main = "Raspodjela po dijabetesu")
+
+promatranja <- table(data$Sex)
+pie(promatranja, labels = c("Žene", "Muškarci"), main = "Raspodjela spola")
+
+promatranja <- table(data$HighChol)
+pie(promatranja, labels = c("Visok kolesterol", "Nizak kolesterol"), main = "Raspodjela po kolesterolu")
+
+promatranja <- table(data$Age)
+pie(promatranja, labels = c("18-24", "25-29", "30-34", "35-39", "40-44", 
+                            "45-49", "50-54", "55-59", "60-64", "65-69", 
+                            "70-74", "75-79", "80+ godina"), 
+    main = "Raspodjela po dobi")
+
+promatranja <- table(data$Education)
+pie(promatranja, labels = c("Samo vrtić", "Osnovna", "Nešto srednje škole", 
+                            "Srednja škola", "Fakultet 1-3 godine", 
+                            "Fakultet 4 godine ili više"), 
+    main = "Raspodjela po edukaciji")
+
+promatranja <- table(data$Income)
+pie(promatranja, labels = c("Manje od 10.000 dolara", "10.000-15.000 dolara", 
+                            "15.000-20.000 dolara", "20.000-25.000", "25.000-35.000", 
+                            "35.000-50.000", "50.000-75.000", "75.000 ili više dolara"), 
+    main = "Raspodjela po zaradi")
+
+
+

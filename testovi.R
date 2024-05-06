@@ -5,26 +5,26 @@ data <- read.csv(file.choose())
 
 data$Diabetes_binary <- as.factor(data$Diabetes_binary)
 
-data$BMI_Group <- cut(data$BMI, breaks = c(0, 18.5, 24.9, 29.9, 39.9, Inf), 
+data$BMI_Group <- cut(data$BMI, breaks = c(0, 18.5, 24.9, 29.9, 39.9, Inf),
                       labels = c("Underweight", "Healthy weight", "Overweight", "Obesity", "Severe obesity"))
-data$Age_Group <- cut(data$Age, breaks = c(seq(0, 13, by=3)), labels = c("18-34", "35-54", "55-69", "70-80+"))
-data$Education_Group <- cut(data$Education, breaks = c(seq(0, 6, by=2)), labels = FALSE)
+data$Age_Group <- cut(data$Age, breaks = c(seq(0, 13, by = 3)), labels = c("18-34", "35-54", "55-69", "70-80+"))
+data$Education_Group <- cut(data$Education, breaks = c(seq(0, 6, by = 2)), labels = FALSE)
 
 vars <- c("HighChol", "CholCheck", "BMI_Group", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost",
           "Sex", "Age_Group", "Education_Group", "Income")
 
 for (var in vars) {
-  Tab <- table(data$Diabetes_binary, data[[var]])
+  tab <- table(data$Diabetes_binary, data[[var]])
   cat("Table for", var, ":\n")
-  print(Tab)
-  barplot(Tab, beside = TRUE, legend = TRUE, main = paste("Barplot for", var))
+  print(tab)
+  barplot(tab, beside = TRUE, legend = TRUE, main = paste("Barplot for", var))
   
-  CTest <- chisq.test(Tab, correct = TRUE)
+  c_test <- chisq.test(tab, correct = TRUE)
   cat("\nH0: The", var, "is independent of Diabetes_binary\n")
   cat("H1: The", var, "is not independent of Diabetes_binary\n\n")
-  print(CTest)
+  print(c_test)
   
-  p_value <- CTest$p.value
+  p_value <- c_test$p.value
   
   if (p_value <= 0.01) {
     cat("\nReject H0: There is a significant association between", var, "and Diabetes_binary\n\n")
@@ -35,7 +35,7 @@ for (var in vars) {
 
 vars_to_test <- c("BMI", "Age")
 
-for (var in vars_to_test) {
+for (var in vars_to_test) { # nolint
   sw_test_diabetic <- shapiro.test(data[[var]][data$Diabetes_binary == 1])
   sw_test_nondiabetic <- shapiro.test(data[[var]][data$Diabetes_binary == 0])
   
@@ -61,7 +61,7 @@ for (var in vars_to_test) {
   print(bartlett_test)
 
 
-  if (sw_test_diabetic$p.value > 0.01 & sw_test_nondiabetic$p.value > 0.01) {
+  if (sw_test_diabetic$p.value > 0.01 && sw_test_nondiabetic$p.value > 0.01) {
     cat("Both groups follow a normal distribution.\n")
     
     if (f_test$p.value > 0.01 && levene_test$p.value && bartlett_test$p.value) {
@@ -74,7 +74,7 @@ for (var in vars_to_test) {
       if (t_test$p.value <= 0.01) {
         cat("\nReject H0: There is a significant difference in ", var, " between diabetic and non-diabetic groups.\n")
       } else {
-        cat("\nFail to reject H0: There is no significant difference in ", var," between diabetic and non-diabetic groups.\n")
+        cat("\nFail to reject H0: There is no significant difference in ", var, " between diabetic and non-diabetic groups.\n")
       }
       
     } else {
@@ -125,9 +125,9 @@ vars_to_plot <- c("BMI", "Age")
 par(mfrow = c(1, length(vars_to_plot)))
 
 for (var in vars_to_plot) {
-  boxplot(data[[var]] ~ data$Diabetes_binary, 
-          xlab = "Diabetes Status", 
-          ylab = var, 
+  boxplot(data[[var]] ~ data$Diabetes_binary,
+          xlab = "Diabetes Status",
+          ylab = var,
           main = paste("Boxplot of", var, "by Diabetes Status"),
           col = c("lightblue", "lightgreen"),
           names = c("Non-Diabetic", "Diabetic"))
@@ -175,22 +175,19 @@ promatranja <- table(data$HighChol)
 pie(promatranja, labels = c("Visok kolesterol", "Nizak kolesterol"), main = "Raspodjela po kolesterolu")
 
 promatranja <- table(data$Age)
-pie(promatranja, labels = c("18-24", "25-29", "30-34", "35-39", "40-44", 
-                            "45-49", "50-54", "55-59", "60-64", "65-69", 
-                            "70-74", "75-79", "80+ godina"), 
+pie(promatranja, labels = c("18-24", "25-29", "30-34", "35-39", "40-44",
+                            "45-49", "50-54", "55-59", "60-64", "65-69",
+                            "70-74", "75-79", "80+ godina"),
     main = "Raspodjela po dobi")
 
 promatranja <- table(data$Education)
-pie(promatranja, labels = c("Samo vrtić", "Osnovna", "Nešto srednje škole", 
-                            "Srednja škola", "Fakultet 1-3 godine", 
-                            "Fakultet 4 godine ili više"), 
+pie(promatranja, labels = c("Samo vrtić", "Osnovna", "Nešto srednje škole",
+                            "Srednja škola", "Fakultet 1-3 godine",
+                            "Fakultet 4 godine ili više"),
     main = "Raspodjela po edukaciji")
 
 promatranja <- table(data$Income)
-pie(promatranja, labels = c("Manje od 10.000 dolara", "10.000-15.000 dolara", 
-                            "15.000-20.000 dolara", "20.000-25.000", "25.000-35.000", 
-                            "35.000-50.000", "50.000-75.000", "75.000 ili više dolara"), 
+pie(promatranja, labels = c("Manje od 10.000 dolara", "10.000-15.000 dolara",
+                            "15.000-20.000 dolara", "20.000-25.000", "25.000-35.000",
+                            "35.000-50.000", "50.000-75.000", "75.000 ili više dolara"),
     main = "Raspodjela po zaradi")
-
-
-

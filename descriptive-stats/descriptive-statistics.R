@@ -1,4 +1,3 @@
-
 data <- read.csv(file.choose())
 
 # Deskriptivna statistika - numericka varijabla (BMI)

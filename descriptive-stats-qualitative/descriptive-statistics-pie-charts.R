@@ -1,3 +1,5 @@
+data <- read.csv(file.choose())
+
 # Deskriptivna statistika - kvalitativne varijable
 promatranja <- table(data$Diabetes_binary)
 pie(promatranja, labels = c("Nema dijabetes", "Ima dijabetes"), main = "Raspodjela po dijabetesu")

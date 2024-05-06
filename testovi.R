@@ -107,8 +107,6 @@ for (var in vars_to_test) { # nolint
     } else {
       cat("\nFail to reject H0: There is no significant difference in ", var, " between diabetic and non-diabetic groups.\n")
     }
-    
-    
   }
 }
 

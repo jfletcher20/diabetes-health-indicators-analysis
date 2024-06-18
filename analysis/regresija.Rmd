@@ -1,5 +1,5 @@
 ---
-title: "regresija"
+title: "Regresija"
 output: html_document
 ---
 
@@ -28,7 +28,7 @@ Jednadžba:
 
 $$logit(DiabetesBinary) = \beta_{0} + \beta_1BMI + \beta_2HighBP + \beta_3GenHlth + \beta_4Income + \epsilon$$
 
-$logit(admit)$ je $ln(P(imati_dijabetes)/P(nemati_dijabetes))$
+$logit(admit)$ je $ln(P(imati\_dijabetes)/P(nemati\_dijabetes))$
   
 ```{r}
 data$Diabetes_binary <- as.factor(data$Diabetes_binary)
@@ -46,18 +46,15 @@ skup <- data %>%
 set.seed(1)
 split = initial_split(skup, prop = 0.7, strata = Diabetes_binary)
 train = split %>% 
-         training()
+  training()
 test = split %>% 
-        testing()
+  testing()
 
 attach(train)
 summary(train)
 
 library(psych)
-
 describe(train)
-
-
 
 model <- glm(Diabetes_binary ~ BMI + Income + HighBP + GenHlth, data = train, family = binomial)
 summary(model)
@@ -65,8 +62,7 @@ summary(model)
 
 $$logit(DiabetesBinary) = -5.36003 + 0.06975*BMI + 1.20292*HighBP1 + 1.34604GenHlth2 + 2.37584GenHlth3 + 2.51745GenHlth4 + 2.80037GenHlth5 + 0.78698Income2 + 1.02183Income3 + 0.76518Income4 + 1.18561Income5 + 0.61090Income6 + 0.70241Income7 + 0.38522Income8$$
 
-
-## Koeficijenti logističke regresije i omjera izgleda 
+## Koeficijenti logističke regresije i omjera izgleda
 
 ```{r}
 exp(model$coefficients)
@@ -76,15 +72,15 @@ exp(confint(model))
 ## Signifikantnost modela
 
 ```{r}
-# testna statistika 
-ModelChi = model$null.deviance - model$deviance  
-ModelChi   
+# testna statistika
+ModelChi = model$null.deviance - model$deviance
+ModelChi
 
-# broj stupnjeva slobode 
-ChiDf = model$df.null - model$df.residual  
-ChiDf   
+# broj stupnjeva slobode
+ChiDf = model$df.null - model$df.residual
+ChiDf
 
-# p-vrijednost 
-ChisqProb = 1 - pchisq(ModelChi, ChiDf)  
+# p-vrijednost
+ChisqProb = 1 - pchisq(ModelChi, ChiDf)
 ChisqProb
 ```

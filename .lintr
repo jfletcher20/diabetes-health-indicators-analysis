@@ -1,2 +1,6 @@
-linters: linters_with_defaults(line_length_linter=line_length_linter(300), trailing_whitespace_linter=trailing_whitespace_linter(allow_empty_lines = TRUE, allow_in_strings = TRUE), cyclocomp_linter(complexity_limit = 15L))
+linters: linters_with_defaults(
+    line_length_linter=line_length_linter(300),
+    trailing_whitespace_linter=trailing_whitespace_linter(allow_empty_lines = TRUE, allow_in_strings = TRUE),
+    cyclocomp_linter(complexity_limit = 15L)
+)
 encoding: "UTF-8"

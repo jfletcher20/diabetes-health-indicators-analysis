@@ -16,7 +16,7 @@ library(corrplot)
 data <- read.csv(file.choose())
 
 # matrica korelacije
-correlation_matrix <- cor(numeric_vars, use = "complete.obs")
+correlation_matrix <- cor(data$BMI + data$Income + data$HighBP + data$GenHlth + data$Diabetes_binary, use = "complete.obs")
 print(correlation_matrix)
 corrplot(correlation_matrix, method = "circle")
 
@@ -83,4 +83,36 @@ ChiDf
 # p-vrijednost
 ChisqProb = 1 - pchisq(ModelChi, ChiDf)
 ChisqProb
+```
+
+
+#### Procijenjene vrijednosti
+
+```{r}
+if (!require("caret")) install.packages("caret")
+library(caret)
+# Predikcije na testnom skupu
+predictions <- predict(model, newdata = test, type = "response")
+predicted_classes <- ifelse(predictions > 0.5, 1, 0)
+actual_classes <- as.numeric(as.character(test$Diabetes_binary))
+
+# Izračun točnosti, preciznosti i odaziva
+conf_matrix <- confusionMatrix(as.factor(predicted_classes), as.factor(actual_classes))
+
+# Točnost
+accuracy <- conf_matrix$overall['Accuracy']
+accuracy
+
+# Preciznost
+precision <- conf_matrix$byClass['Pos Pred Value']
+precision
+
+# Odaziv
+recall <- conf_matrix$byClass['Sensitivity']
+recall
+
+# Ispis rezultata
+cat("Točnost modela: ", accuracy, "\n")
+cat("Preciznost modela: ", precision, "\n")
+cat("Odaziv modela: ", recall, "\n")
 ```
